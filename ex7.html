@@ -1,0 +1,50 @@
+<html>
+
+<head>
+
+    <script src="https://unpkg.com/vue"></script>
+
+
+</head>
+
+
+<body>
+
+    <div id="app-7">
+        <ol>
+                <usuario-item v-for="u in usuarios" v-bind:usuario="u"></usuario-item>
+
+        </ol>
+    </div>
+   
+
+   <script>
+
+
+
+    Vue.component('usuario-item', {
+        props:['usuario'],
+        template:'<li> {{ usuario.nome }} |  {{ usuario.email}}</li>'
+    })
+
+
+   var app7=new Vue({
+            el:"#app-7",
+            data:{
+                usuarios:[ 
+                    {nome:'Jão' , email:'jao@gmail.com'}, 
+                    {nome:'Zé' , email:'ze@gmail.com'},
+                    {nome:'Maria' , email:'maria@gmail.com'} 
+                ] 
+            }
+
+    });
+
+   </script>
+
+</body>
+
+
+
+
+</html>

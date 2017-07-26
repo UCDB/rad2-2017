@@ -1,0 +1,40 @@
+<html>
+
+<head>
+
+    <script src="https://unpkg.com/vue"></script>
+
+</head>
+
+
+<body>
+
+
+    <div id="app-5">
+        <p> {{message}} </p>
+        <button v-on:click="reverseMessage"> Reverter </button>
+
+
+    </div>
+
+
+</body>
+
+<script>
+
+var app = new Vue({
+  el: '#app-5',
+  data: {
+   message: 'Curso JS UCDB'
+  },
+  methods:{
+      reverseMessage:function(){
+              this.message = this.message.split('').reverse().join('')
+      }    
+  }
+})
+
+</script>
+
+
+</html>
