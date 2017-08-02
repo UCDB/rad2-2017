@@ -1,0 +1,75 @@
+<html>
+
+<head>
+
+    <script src="https://unpkg.com/vue"></script>
+
+</head>
+
+
+<body>
+
+  
+    <div id="app">
+    <input type="text" v-model="usuarioNovo.nome"> 
+    <button type="button" v-on:click="salvar">Salvar</button>
+     <button type="button" v-on:click="novo">Cancelar</button>
+
+       <ol>
+           <li v-for="(u,index) in usuarios">{{u.nome}}
+                <button type="button" v-on:click="excluir(index)">Excluir</button>
+             <button type="button" v-on:click="preparaAlterar(index)">Alterar</button>
+           </li>
+       </ol>
+
+    </div>
+
+</body>
+
+<script>
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    indiceAlterar:-1,
+    usuarioNovo:{nome:""},
+    usuarios: [ {nome:"Jão"} , {nome:"Zé"}, {nome:"Maria"} ,{nome:"ze"}]
+  },
+  methods:{
+        salvar:function(){
+                if(this.indiceAlterar==-1){
+                    this.adicionar();
+                }else {
+                    this.alterar();
+                     this.indiceAlterar=-1;
+                }
+                this.novo();
+        },
+         alterar:function (){
+                this.usuarios.splice(this.indiceAlterar, 1, this.usuarioNovo);   
+               
+        },
+        adicionar:function(){
+            this.usuarios.push(this.usuarioNovo);
+           
+        },
+        excluir :function(i){
+           // window.alert(i);
+            this.usuarios.splice(i,1)
+        },
+         preparaAlterar :function(i){
+           // window.alert(i);
+            this.usuarioNovo=  Vue.util.extend({},this.usuarios[i]); 
+            this.indiceAlterar=i;
+        },
+         novo :function(i){
+           // window.alert(i);
+             this.usuarioNovo={nome:""}
+        }
+  }
+})
+
+</script>
+
+
+</html>
