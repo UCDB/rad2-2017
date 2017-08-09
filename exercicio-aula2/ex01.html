@@ -3,6 +3,7 @@
 <head>
 
     <script src="https://unpkg.com/vue"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.3.4"></script>
 
 </head>
 
@@ -15,12 +16,12 @@
     <button type="button" v-on:click="salvar">Salvar</button>
      <button type="button" v-on:click="novo">Cancelar</button>
 
-       <ol>
-           <li v-for="(u,index) in usuarios">{{u.nome}}
+       <ul style="list-style-type: none" >
+           <li  v-for="(u,index) in usuarios">{{u.id}} {{u.nome}}
                 <button type="button" v-on:click="excluir(index)">Excluir</button>
              <button type="button" v-on:click="preparaAlterar(index)">Alterar</button>
            </li>
-       </ol>
+       </ul>
 
     </div>
 
@@ -28,34 +29,77 @@
 
 <script>
 
+
+
 var app = new Vue({
   el: '#app',
   data: {
     indiceAlterar:-1,
     usuarioNovo:{nome:""},
-    usuarios: [ {nome:"Jão"} , {nome:"Zé"}, {nome:"Maria"} ,{nome:"ze"}]
+    usuarios: []
   },
-  methods:{
+    mounted:function(){
+
+        this.buscarTodos();
+    },
+    methods:{
+        buscarTodos:function(){
+            this.$http.get("http://localhost:8080/usuarios/todos")
+                    .then(function(res){
+                        this.usuarios = res.body;
+                    }, function (res){
+                        console.log(res);
+                    });
+
+        },
         salvar:function(){
-                if(this.indiceAlterar==-1){
-                    this.adicionar();
-                }else {
-                    this.alterar();
-                     this.indiceAlterar=-1;
-                }
-                this.novo();
+
+            this.$http.post("http://localhost:8080/usuarios",this.usuarioNovo)
+                    .then(function(res){
+                        this.usuarioNovo = res.body;
+
+                        if(this.indiceAlterar==-1){
+                            this.adicionar();
+                        }else {
+                            this.alterar();
+                            this.indiceAlterar=-1;
+                        }
+                        this.novo();
+
+
+                    }, function (res){
+                        console.log(res);
+                    });
+
+
+
         },
          alterar:function (){
-                this.usuarios.splice(this.indiceAlterar, 1, this.usuarioNovo);   
-               
+             this.$http.put("http://localhost:8080/usuarios",this.usuarioNovo)
+                     .then(function(res) {
+                            this.buscarTodos();
+                         // this.usuarios.splice(this.indiceAlterar, 1, this.usuarioNovo);
+                     }, function (res){
+                         console.log(res);
+                     });
+
         },
         adicionar:function(){
             this.usuarios.push(this.usuarioNovo);
            
         },
         excluir :function(i){
+
+            usuarioDel = this.usuarios[i];
+            this.$http.delete("http://localhost:8080/usuarios",usuarioDel.id)
+                    .then(function(res) {
+                        this.buscarTodos();
+                        // this.usuarios.splice(this.indiceAlterar, 1, this.usuarioNovo);
+                    }, function (res){
+                        console.log(res);
+                    });
            // window.alert(i);
-            this.usuarios.splice(i,1)
+            //this.usuarios.splice(i,1)
         },
          preparaAlterar :function(i){
            // window.alert(i);
