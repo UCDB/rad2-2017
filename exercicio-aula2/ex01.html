@@ -12,12 +12,18 @@
 
   
     <div id="app">
-    <input type="text" v-model="usuarioNovo.nome"> 
+    <input type="text" v-model="usuarioNovo.nome">
+        <select v-model="usuarioNovo.perfil">
+            <option disabled>Perfil</option>
+            <option v-for="p in perfis" v-bind:value="p">
+                {{ p.descricao }}
+            </option>
+        </select>
     <button type="button" v-on:click="salvar">Salvar</button>
      <button type="button" v-on:click="novo">Cancelar</button>
 
        <ul style="list-style-type: none" >
-           <li  v-for="(u,index) in usuarios">{{u.id}} {{u.nome}}
+           <li  v-for="(u,index) in usuarios">{{u.id}} {{u.nome}}  {{u.perfil.descricao}}
                 <button type="button" v-on:click="excluir(index)">Excluir</button>
              <button type="button" v-on:click="preparaAlterar(index)">Alterar</button>
            </li>
@@ -35,14 +41,26 @@ var app = new Vue({
   el: '#app',
   data: {
     indiceAlterar:-1,
-    usuarioNovo:{nome:""},
-    usuarios: []
+    usuarioNovo:{nome:"",perfil:""},
+    usuarios: [],
+      perfis: []
   },
     mounted:function(){
 
         this.buscarTodos();
+        this.buscarTodosPerfis();
     },
     methods:{
+
+        buscarTodosPerfis:function(){
+            this.$http.get("http://localhost:8080/usuarios/perfil")
+                    .then(function(res){
+                        this.perfis = res.body;
+                    }, function (res){
+                        console.log(res);
+                    });
+
+        },
         buscarTodos:function(){
             this.$http.get("http://localhost:8080/usuarios/todos")
                     .then(function(res){
@@ -54,23 +72,14 @@ var app = new Vue({
         },
         salvar:function(){
 
-            this.$http.post("http://localhost:8080/usuarios",this.usuarioNovo)
-                    .then(function(res){
-                        this.usuarioNovo = res.body;
 
-                        if(this.indiceAlterar==-1){
-                            this.adicionar();
-                        }else {
-                            this.alterar();
-                            this.indiceAlterar=-1;
-                        }
-                        this.novo();
+                if(this.usuarioNovo.id==""){
+                    this.adicionar();
+                }else {
+                    this.alterar();
 
-
-                    }, function (res){
-                        console.log(res);
-                    });
-
+                }
+                this.novo();
 
 
         },
@@ -78,20 +87,28 @@ var app = new Vue({
              this.$http.put("http://localhost:8080/usuarios",this.usuarioNovo)
                      .then(function(res) {
                             this.buscarTodos();
-                         // this.usuarios.splice(this.indiceAlterar, 1, this.usuarioNovo);
+
                      }, function (res){
-                         console.log(res);
+                         window.alert(res.body.mensagem);
                      });
 
         },
         adicionar:function(){
-            this.usuarios.push(this.usuarioNovo);
+
+            this.$http.post("http://localhost:8080/usuarios",this.usuarioNovo)
+                    .then(function(res) {
+                        this.buscarTodos();
+
+                    }, function (res){
+                      window.alert(res.mensagem);
+                    });
+
            
         },
         excluir :function(i){
 
             usuarioDel = this.usuarios[i];
-            this.$http.delete("http://localhost:8080/usuarios",usuarioDel.id)
+            this.$http.delete("http://localhost:8080/usuarios/"+usuarioDel.id)
                     .then(function(res) {
                         this.buscarTodos();
                         // this.usuarios.splice(this.indiceAlterar, 1, this.usuarioNovo);
